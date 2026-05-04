@@ -9,7 +9,9 @@ public class Length {
     // Enum for units (base unit = inches)
     public enum LengthUnit {
         FEET(12.0),
-        INCHES(1.0);
+        INCHES(1.0),
+        YARDS(36.0),
+        CENTIMETERS(0.393701);
 
         private final double conversionFactor;
 
@@ -31,45 +33,49 @@ public class Length {
         this.unit = unit;
     }
 
-    // Convert to base unit (inches)
+    // Convert to base unit (inches) + rounding
     private double convertToBaseUnit() {
-        return this.value * this.unit.getConversionFactor();
+        double result = this.value * this.unit.getConversionFactor();
+        return Math.round(result * 100.0) / 100.0;
     }
 
-    // Compare two Length objects
-    public boolean compare(Length otherLength) {
-        if (otherLength == null) return false;
+    // Compare method
+    public boolean compare(Length thatLength) {
+        if (thatLength == null) return false;
+
         return Double.compare(this.convertToBaseUnit(),
-                otherLength.convertToBaseUnit()) == 0;
+                thatLength.convertToBaseUnit()) == 0;
     }
 
-    // Override equals()
+    // equals() override
     @Override
     public boolean equals(Object o) {
-        // Reflexive
         if (this == o) return true;
-
-        // Null + type check
         if (o == null || getClass() != o.getClass()) return false;
 
         Length other = (Length) o;
-
-        // Compare using base unit
-        return Double.compare(this.convertToBaseUnit(),
-                other.convertToBaseUnit()) == 0;
+        return this.compare(other);
     }
 
-    // HashCode (important for equals contract)
+    // hashCode (important)
     @Override
     public int hashCode() {
         return Double.valueOf(convertToBaseUnit()).hashCode();
     }
 
-    // Main method (already given in your code)
+    // Main method (demo)
     public static void main(String[] args) {
+
         Length length1 = new Length(1.0, LengthUnit.FEET);
         Length length2 = new Length(12.0, LengthUnit.INCHES);
-
         System.out.println("Are lengths equal? " + length1.equals(length2));
+
+        Length length3 = new Length(1.0, LengthUnit.YARDS);
+        Length length4 = new Length(36.0, LengthUnit.INCHES);
+        System.out.println("Are lengths equal? " + length3.equals(length4));
+
+        Length length5 = new Length(100.0, LengthUnit.CENTIMETERS);
+        Length length6 = new Length(39.3701, LengthUnit.INCHES);
+        System.out.println("Are lengths equal? " + length5.equals(length6));
     }
 }
