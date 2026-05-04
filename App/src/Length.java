@@ -1,15 +1,17 @@
 
-
 /**
- * A generic class for representing and comparing lengths in different units.
- * Base unit = inches
+ * Quantity Length class supporting:
+ * - Equality (UC3)
+ * - Extended units (UC4)
+ * - Conversion (UC5)
+ * - Addition (UC6)
  */
 public class Length {
 
-    private double value;
+    double value;
     private LengthUnit unit;
 
-    // Enum with conversion factors (relative to inches)
+    // Enum with base unit = inches
     public enum LengthUnit {
         FEET(12.0),
         INCHES(1.0),
@@ -46,20 +48,30 @@ public class Length {
     }
 
     // Compare method
-    public boolean compare(Length thatLength) {
+    private boolean compare(Length thatLength) {
         if (thatLength == null) return false;
 
         return Double.compare(this.convertToBaseUnit(),
                 thatLength.convertToBaseUnit()) == 0;
     }
 
-    // Convert to another unit (IMPORTANT UC5)
+    // equals override
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Length)) return false;
+
+        Length other = (Length) o;
+        return compare(other);
+    }
+
+    // Convert to another unit (UC5)
     public Length convertTo(LengthUnit targetUnit) {
         if (targetUnit == null) {
             throw new IllegalArgumentException("Target unit cannot be null");
         }
 
-        double baseValue = this.convertToBaseUnit();
+        double baseValue = convertToBaseUnit();
         double convertedValue = baseValue / targetUnit.getConversionFactor();
 
         convertedValue = Math.round(convertedValue * 100.0) / 100.0;
@@ -67,17 +79,44 @@ public class Length {
         return new Length(convertedValue, targetUnit);
     }
 
-    // equals override
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+    // STATIC convert API (UC5)
+    public static double convert(double value, LengthUnit source, LengthUnit target) {
 
-        Length other = (Length) o;
-        return this.compare(other);
+        if (source == null || target == null) {
+            throw new IllegalArgumentException("Units cannot be null");
+        }
+
+        if (!Double.isFinite(value)) {
+            throw new IllegalArgumentException("Invalid value");
+        }
+
+        double baseValue = value * source.getConversionFactor();
+        return baseValue / target.getConversionFactor();
     }
 
-    // toString override
+    // ================== UC6 ADD METHOD ==================
+    public Length add(Length thatLength) {
+
+        if (thatLength == null) {
+            throw new IllegalArgumentException("Second operand cannot be null");
+        }
+
+        // Step 1: Convert both to base unit
+        double thisBase = this.convertToBaseUnit();
+        double thatBase = thatLength.convertToBaseUnit();
+
+        // Step 2: Add
+        double sumBase = thisBase + thatBase;
+
+        // Step 3: Convert back to this.unit
+        double resultValue = sumBase / this.unit.getConversionFactor();
+
+        resultValue = Math.round(resultValue * 100.0) / 100.0;
+
+        return new Length(resultValue, this.unit);
+    }
+
+    // toString
     @Override
     public String toString() {
         return String.format("%.2f %s", value, unit);
@@ -86,24 +125,5 @@ public class Length {
     @Override
     public int hashCode() {
         return Double.valueOf(convertToBaseUnit()).hashCode();
-    }
-    // Static conversion API (UC5 requirement)
-    public static double convert(double value, LengthUnit source, LengthUnit target) {
-
-        if (source == null || target == null) {
-            throw new IllegalArgumentException("Units cannot be null");
-        }
-
-        if (!Double.isFinite(value)) {
-            throw new IllegalArgumentException("Invalid numeric value");
-        }
-
-        // Convert to base unit (inches)
-        double baseValue = value * source.getConversionFactor();
-
-        // Convert to target unit
-        double result = baseValue / target.getConversionFactor();
-
-        return result;
     }
 }
