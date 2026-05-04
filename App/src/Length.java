@@ -1,12 +1,15 @@
 
 
+/**
+ * A generic class for representing and comparing lengths in different units.
+ * Base unit = inches
+ */
 public class Length {
 
-    // Instance variables
     private double value;
     private LengthUnit unit;
 
-    // Enum for units (base unit = inches)
+    // Enum with conversion factors (relative to inches)
     public enum LengthUnit {
         FEET(12.0),
         INCHES(1.0),
@@ -29,13 +32,16 @@ public class Length {
         if (unit == null) {
             throw new IllegalArgumentException("Unit cannot be null");
         }
+        if (!Double.isFinite(value)) {
+            throw new IllegalArgumentException("Invalid value");
+        }
         this.value = value;
         this.unit = unit;
     }
 
-    // Convert to base unit (inches) + rounding
+    // Convert to base unit (inches)
     private double convertToBaseUnit() {
-        double result = this.value * this.unit.getConversionFactor();
+        double result = value * unit.getConversionFactor();
         return Math.round(result * 100.0) / 100.0;
     }
 
@@ -47,7 +53,21 @@ public class Length {
                 thatLength.convertToBaseUnit()) == 0;
     }
 
-    // equals() override
+    // Convert to another unit (IMPORTANT UC5)
+    public Length convertTo(LengthUnit targetUnit) {
+        if (targetUnit == null) {
+            throw new IllegalArgumentException("Target unit cannot be null");
+        }
+
+        double baseValue = this.convertToBaseUnit();
+        double convertedValue = baseValue / targetUnit.getConversionFactor();
+
+        convertedValue = Math.round(convertedValue * 100.0) / 100.0;
+
+        return new Length(convertedValue, targetUnit);
+    }
+
+    // equals override
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -57,25 +77,33 @@ public class Length {
         return this.compare(other);
     }
 
-    // hashCode (important)
+    // toString override
+    @Override
+    public String toString() {
+        return String.format("%.2f %s", value, unit);
+    }
+
     @Override
     public int hashCode() {
         return Double.valueOf(convertToBaseUnit()).hashCode();
     }
+    // Static conversion API (UC5 requirement)
+    public static double convert(double value, LengthUnit source, LengthUnit target) {
 
-    // Main method (demo)
-    public static void main(String[] args) {
+        if (source == null || target == null) {
+            throw new IllegalArgumentException("Units cannot be null");
+        }
 
-        Length length1 = new Length(1.0, LengthUnit.FEET);
-        Length length2 = new Length(12.0, LengthUnit.INCHES);
-        System.out.println("Are lengths equal? " + length1.equals(length2));
+        if (!Double.isFinite(value)) {
+            throw new IllegalArgumentException("Invalid numeric value");
+        }
 
-        Length length3 = new Length(1.0, LengthUnit.YARDS);
-        Length length4 = new Length(36.0, LengthUnit.INCHES);
-        System.out.println("Are lengths equal? " + length3.equals(length4));
+        // Convert to base unit (inches)
+        double baseValue = value * source.getConversionFactor();
 
-        Length length5 = new Length(100.0, LengthUnit.CENTIMETERS);
-        Length length6 = new Length(39.3701, LengthUnit.INCHES);
-        System.out.println("Are lengths equal? " + length5.equals(length6));
+        // Convert to target unit
+        double result = baseValue / target.getConversionFactor();
+
+        return result;
     }
 }
