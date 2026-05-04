@@ -7,7 +7,7 @@ public class QuantityMeasurementApp {
         return length1.equals(length2);
     }
 
-    // Comparison using raw values
+    // Comparison (value-based)
     public static boolean demonstrateLengthComparison(
             double value1, Length.LengthUnit unit1,
             double value2, Length.LengthUnit unit2) {
@@ -36,34 +36,28 @@ public class QuantityMeasurementApp {
         return length.convertTo(toUnit);
     }
 
-    // 🔥 UC6 ADDITION METHOD
-    public static Length demonstrateLengthAddition(Length length1, Length length2) {
-        return length1.add(length2);
+    // 🔥 UC7 ADDITION (MAIN METHOD)
+    public static Length demonstrateLengthAddition(
+            Length length1,
+            Length length2,
+            Length.LengthUnit targetUnit) {
+
+        return length1.add(length2, targetUnit);
     }
 
-    // Main method
+    // Main method (optional demo)
     public static void main(String[] args) {
 
-        // Equality
-        System.out.println("Equality: " +
-                demonstrateLengthComparison(1.0, Length.LengthUnit.FEET,
-                        12.0, Length.LengthUnit.INCHES));
+        Length l1 = new Length(1.0, Length.LengthUnit.FEET);
+        Length l2 = new Length(12.0, Length.LengthUnit.INCHES);
 
-        // Conversion
-        System.out.println("Conversion: " +
-                demonstrateLengthConversion(3.0,
-                        Length.LengthUnit.FEET,
-                        Length.LengthUnit.INCHES));
+        System.out.println("Feet: " +
+                demonstrateLengthAddition(l1, l2, Length.LengthUnit.FEET));
 
-        // Addition examples
-        System.out.println("Addition (Feet + Inches): " +
-                demonstrateLengthAddition(
-                        new Length(1.0, Length.LengthUnit.FEET),
-                        new Length(12.0, Length.LengthUnit.INCHES)));
+        System.out.println("Inches: " +
+                demonstrateLengthAddition(l1, l2, Length.LengthUnit.INCHES));
 
-        System.out.println("Addition (Yard + Feet): " +
-                demonstrateLengthAddition(
-                        new Length(1.0, Length.LengthUnit.YARDS),
-                        new Length(3.0, Length.LengthUnit.FEET)));
+        System.out.println("Yards: " +
+                demonstrateLengthAddition(l1, l2, Length.LengthUnit.YARDS));
     }
 }
