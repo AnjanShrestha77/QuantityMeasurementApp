@@ -1,17 +1,12 @@
 
-/**
- * Quantity Length class supporting:
- * - Equality (UC3)
- * - Extended units (UC4)
- * - Conversion (UC5)
- * - Addition (UC6)
- */
+
 public class Length {
 
+    // Instance variables
     double value;
     private LengthUnit unit;
 
-    // Enum with base unit = inches
+    // Enum (base unit = inches)
     public enum LengthUnit {
         FEET(12.0),
         INCHES(1.0),
@@ -33,9 +28,6 @@ public class Length {
     public Length(double value, LengthUnit unit) {
         if (unit == null) {
             throw new IllegalArgumentException("Unit cannot be null");
-        }
-        if (!Double.isFinite(value)) {
-            throw new IllegalArgumentException("Invalid value");
         }
         this.value = value;
         this.unit = unit;
@@ -65,7 +57,7 @@ public class Length {
         return compare(other);
     }
 
-    // Convert to another unit (UC5)
+    // Convert to another unit
     public Length convertTo(LengthUnit targetUnit) {
         if (targetUnit == null) {
             throw new IllegalArgumentException("Target unit cannot be null");
@@ -79,36 +71,13 @@ public class Length {
         return new Length(convertedValue, targetUnit);
     }
 
-    // STATIC convert API (UC5)
-    public static double convert(double value, LengthUnit source, LengthUnit target) {
-
-        if (source == null || target == null) {
-            throw new IllegalArgumentException("Units cannot be null");
-        }
-
-        if (!Double.isFinite(value)) {
-            throw new IllegalArgumentException("Invalid value");
-        }
-
-        double baseValue = value * source.getConversionFactor();
-        return baseValue / target.getConversionFactor();
-    }
-
-    // ================== UC6 ADD METHOD ==================
+    // ================= UC6 (existing) =================
     public Length add(Length thatLength) {
-
         if (thatLength == null) {
-            throw new IllegalArgumentException("Second operand cannot be null");
+            throw new IllegalArgumentException("Length cannot be null");
         }
 
-        // Step 1: Convert both to base unit
-        double thisBase = this.convertToBaseUnit();
-        double thatBase = thatLength.convertToBaseUnit();
-
-        // Step 2: Add
-        double sumBase = thisBase + thatBase;
-
-        // Step 3: Convert back to this.unit
+        double sumBase = this.convertToBaseUnit() + thatLength.convertToBaseUnit();
         double resultValue = sumBase / this.unit.getConversionFactor();
 
         resultValue = Math.round(resultValue * 100.0) / 100.0;
@@ -116,14 +85,45 @@ public class Length {
         return new Length(resultValue, this.unit);
     }
 
+    // ================= UC7 (MAIN PART) =================
+    public Length add(Length length, LengthUnit targetUnit) {
+
+        if (length == null) {
+            throw new IllegalArgumentException("Length cannot be null");
+        }
+
+        if (targetUnit == null) {
+            throw new IllegalArgumentException("Target unit cannot be null");
+        }
+
+        return addAndConvert(length, targetUnit);
+    }
+
+    // Helper method
+    private Length addAndConvert(Length length, LengthUnit targetUnit) {
+
+        double thisBase = this.convertToBaseUnit();
+        double otherBase = length.convertToBaseUnit();
+
+        double sumBase = thisBase + otherBase;
+
+        double resultValue = convertFromBaseToTargetUnit(sumBase, targetUnit);
+
+        return new Length(resultValue, targetUnit);
+    }
+
+    // Base → target conversion
+    private double convertFromBaseToTargetUnit(double lengthInInches,
+                                               LengthUnit targetUnit) {
+
+        double result = lengthInInches / targetUnit.getConversionFactor();
+
+        return Math.round(result * 100.0) / 100.0;
+    }
+
     // toString
     @Override
     public String toString() {
         return String.format("%.2f %s", value, unit);
-    }
-
-    @Override
-    public int hashCode() {
-        return Double.valueOf(convertToBaseUnit()).hashCode();
     }
 }
