@@ -101,4 +101,65 @@ public class Quantity<U extends IMeasurable> {
         long rounded = Math.round(baseValue * 100); // match equals precision
         return Long.hashCode(rounded);
     }
+
+    public Quantity<U> subtract(Quantity<U> other) {
+
+        if (other == null) {
+            throw new IllegalArgumentException("Quantity cannot be null");
+        }
+
+        // Prevent cross-category
+        if (!this.unit.getClass().equals(other.getUnit().getClass())) {
+            throw new IllegalArgumentException("Cannot subtract different measurement categories");
+        }
+
+        double base1 = this.unit.convertToBaseUnit(this.value);
+        double base2 = other.unit.convertToBaseUnit(other.value);
+
+        double resultBase = base1 - base2;
+
+        double result = this.unit.convertFromBaseUnit(resultBase);
+
+        return new Quantity<>(result, this.unit);
+    }
+    public Quantity<U> subtract(Quantity<U> other, U targetUnit) {
+
+        if (other == null || targetUnit == null) {
+            throw new IllegalArgumentException("Invalid input");
+        }
+
+        if (!this.unit.getClass().equals(other.getUnit().getClass())) {
+            throw new IllegalArgumentException("Cannot subtract different measurement categories");
+        }
+
+        double base1 = this.unit.convertToBaseUnit(this.value);
+        double base2 = other.unit.convertToBaseUnit(other.value);
+
+        double resultBase = base1 - base2;
+
+        double result = targetUnit.convertFromBaseUnit(resultBase);
+
+        return new Quantity<>(result, targetUnit);
+    }
+    public double divide(Quantity<U> other) {
+
+        if (other == null) {
+            throw new IllegalArgumentException("Quantity cannot be null");
+        }
+
+        if (!this.unit.getClass().equals(other.getUnit().getClass())) {
+            throw new IllegalArgumentException("Cannot divide different measurement categories");
+        }
+
+        double base1 = this.unit.convertToBaseUnit(this.value);
+        double base2 = other.unit.convertToBaseUnit(other.value);
+
+        if (base2 == 0) {
+            throw new ArithmeticException("Division by zero");
+        }
+
+        return base1 / base2;
+    }
+
+
 }
