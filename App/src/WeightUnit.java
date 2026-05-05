@@ -1,6 +1,6 @@
 
 
-public enum WeightUnit {
+public enum WeightUnit implements IMeasurable {
 
     // Base unit = GRAM
     MILLIGRAM(0.001),
@@ -27,5 +27,10 @@ public enum WeightUnit {
     // Convert from base (grams)
     public double convertFromBaseUnit(double baseValue) {
         return Math.round((baseValue / conversionFactor) * 100.0) / 100.0;
+    }
+
+    @Override
+    public String getUnitName() {
+        return this.name();
     }
 }
