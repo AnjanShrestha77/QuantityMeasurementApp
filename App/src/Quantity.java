@@ -36,9 +36,16 @@ public class Quantity<U extends IMeasurable> {
     /**
      * Converts this quantity to target unit
      */
-    public double convertTo(U targetUnit) {
+    public Quantity<U> convertTo(U targetUnit) {
+
+        if (targetUnit == null) {
+            throw new IllegalArgumentException("Target unit cannot be null");
+        }
+
         double baseValue = unit.convertToBaseUnit(value);
-        return targetUnit.convertFromBaseUnit(baseValue);
+        double convertedValue = targetUnit.convertFromBaseUnit(baseValue);
+
+        return new Quantity<>(convertedValue, targetUnit);
     }
 
     /**
