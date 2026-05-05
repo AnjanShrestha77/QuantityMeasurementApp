@@ -1,6 +1,6 @@
 
 
-public enum LengthUnit {
+public enum LengthUnit implements IMeasurable{
 
     // Base unit = FEET
     FEET(1.0),
@@ -10,8 +10,10 @@ public enum LengthUnit {
 
     private final double conversionFactor;
 
+
     LengthUnit(double conversionFactor) {
         this.conversionFactor = conversionFactor;
+
     }
 
     public double getConversionFactor() {
@@ -28,5 +30,10 @@ public enum LengthUnit {
     public double convertFromBaseUnit(double baseValue) {
         double result = baseValue / conversionFactor;
         return Math.round(result * 100.0) / 100.0;
+    }
+
+    @Override
+    public String getUnitName() {
+        return this.name();
     }
 }
