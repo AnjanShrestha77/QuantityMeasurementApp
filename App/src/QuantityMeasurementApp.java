@@ -118,4 +118,27 @@ public class QuantityMeasurementApp {
 
         System.out.println("Are lengths equal? " + lengthEqual);
     }
+    // SUBTRACTION
+    public static <U extends IMeasurable> Quantity<U> demonstrateSubtraction(
+            Quantity<U> q1,
+            Quantity<U> q2) {
+
+        return q1.subtract(q2);
+    }
+
+    public static <U extends IMeasurable> Quantity<U> demonstrateSubtraction(
+            Quantity<U> q1,
+            Quantity<U> q2,
+            U targetUnit) {
+
+        return q1.subtract(q2, targetUnit);
+    }
+
+    // DIVISION
+    public static <U extends IMeasurable> double demonstrateDivision(
+            Quantity<U> q1,
+            Quantity<U> q2) {
+
+        return q1.divide(q2);
+    }
 }
