@@ -1,15 +1,4 @@
-/**
- * Main class to demonstrate Quantity Measurement operations
- *
- * Features:
- * - Equality comparison
- * - Unit conversion
- * - Addition (same unit result)
- * - Addition (target unit result)
- *
- * @author Anjan
- * @version 11.0
- */
+
 public class QuantityMeasurementApp {
 
     /**
